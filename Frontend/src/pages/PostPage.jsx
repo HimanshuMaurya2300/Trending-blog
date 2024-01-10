@@ -96,7 +96,8 @@ const PostPage = () => {
 
 
             <div className="image">
-                <img src={import.meta.env.VITE_APP_DEV_URL + `/${postInfo.cover}`} alt="img" />
+                {/* <img src={import.meta.env.VITE_APP_DEV_URL + `/${postInfo.cover}`} alt="img" /> */}
+                <img src={postInfo.cover} alt="img" />
             </div>
 
             <p className="source"><a href="#" target="_blank">Source - Wikipedia</a></p>

@@ -12,6 +12,8 @@ const multer = require('multer');
 const uploadMiddleware = multer({ dest: 'uploads/' });
 const fs = require('fs');
 
+const cloudinary = require('./utils/cloudinary');
+const upload = require('./utils/multer')
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'asdfe45we45w345wegw345werjktjwertkj';
@@ -68,7 +70,12 @@ app.post('/login', async (req, res) => {
                 throw err;
             }
 
-            res.cookie('token', token).json({
+            res.cookie('token', token, {
+                domain: process.env.DOMAIN | '',
+                maxAge: 360000
+            })
+
+            res.json({
                 id: userDoc._id,
                 username,
             });
