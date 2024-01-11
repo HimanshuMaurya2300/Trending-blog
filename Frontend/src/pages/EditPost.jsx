@@ -7,6 +7,8 @@ const EditPost = () => {
 
     const { id } = useParams()
 
+    const token = localStorage.getItem('trendingblog-token')
+
     const navigate = useNavigate()
 
     const [title, setTitle] = useState('')
@@ -17,17 +19,28 @@ const EditPost = () => {
 
 
     useEffect(() => {
-        fetch(import.meta.env.VITE_APP_DEV_URL + `/post/${id}`)
-            .then((response) => {
-                response.json().then(postInfo => {
-                    setTitle(postInfo.title)
-                    setContent(postInfo.content)
-                    setSummary(postInfo.summary)
+        if (!token) {
+            navigate('/')
+        }
+    }, [token, navigate])
 
+
+    useEffect(() => {
+
+        if (token) {
+
+            fetch(import.meta.env.VITE_APP_DEV_URL + `/post/${id}`)
+                .then((response) => {
+                    response.json().then(postInfo => {
+                        setTitle(postInfo.title)
+                        setContent(postInfo.content)
+                        setSummary(postInfo.summary)
+
+                    })
                 })
-            })
-            .catch(err => console.log(err))
-    }, [id])
+                .catch(err => console.log(err))
+        }
+    }, [id, token])
 
 
     const updatePost = async (e) => {

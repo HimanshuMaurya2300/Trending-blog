@@ -6,6 +6,7 @@ const PostSchema = new mongoose.Schema({
     summary: String,
     content: String,
     cover: String,
+    cloudinary_id: String,
     author: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
     timestamps: true,

@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import Editor from '../Editor';
 
 
 
 const CreatePost = () => {
+
+  const token = localStorage.getItem('trendingblog-token')
 
   const navigate = useNavigate()
 
@@ -13,6 +15,13 @@ const CreatePost = () => {
   const [content, setContent] = useState('')
   const [files, setFiles] = useState('')
   const [redirect, setRedirect] = useState(false)
+
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/')
+    }
+  }, [token, navigate])
 
 
   const createNewPost = async (e) => {

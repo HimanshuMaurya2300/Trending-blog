@@ -8,9 +8,6 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const multer = require('multer');
-const uploadMiddleware = multer({ dest: 'uploads/' });
-const fs = require('fs');
 
 const cloudinary = require('./utils/cloudinary');
 const upload = require('./utils/multer')
@@ -106,19 +103,10 @@ app.post('/logout', (req, res) => {
 
 
 
-app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
+app.post('/post', upload.single('file'), async (req, res) => {
 
-    const { originalname, path } = req.file;
-    const parts = originalname.split('.');
-    const ext = parts[parts.length - 1];
-    // res.json({ ext })
-
-    const newPath = path + '.' + ext;
-    fs.renameSync(path, newPath);
-
-    // const { token } = req.cookies;
     const { token } = req.body;
-    console.log(token)
+    // console.log(token)
 
     jwt.verify(token, secret, {}, async (err, info) => {
 
@@ -126,13 +114,17 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
             throw err
         }
 
+        const cover = await cloudinary.uploader.upload(req.file.path)
+        console.log(cover)
+
         const { title, summary, content } = req.body;
 
         const postDoc = await Post.create({
             title,
             summary,
             content,
-            cover: newPath,
+            cover: cover.secure_url,
+            cloudinary_id: cover.public_id,
             author: info.id,
         });
 
@@ -142,23 +134,18 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
 
 
 
-app.put('/post', uploadMiddleware.single('file'), async (req, res) => {
+app.put('/post', upload.single('file'), async (req, res) => {
 
-    let newPath = null;
+    let newCover = null;
 
     if (req.file) {
-
-        const { originalname, path } = req.file;
-        const parts = originalname.split('.');
-        const ext = parts[parts.length - 1];
-        newPath = path + '.' + ext;
-        fs.renameSync(path, newPath);
+        newCover = await cloudinary.uploader.upload(req.file.path)
     }
 
     // const { token } = req.cookies;
 
     const { token } = req.body;
-    console.log(token);
+    // console.log(token);
 
     jwt.verify(token, secret, {}, async (err, info) => {
 
@@ -176,11 +163,16 @@ app.put('/post', uploadMiddleware.single('file'), async (req, res) => {
             return res.status(400).json('you are not the author');
         }
 
+        if (newCover) {
+            await cloudinary.uploader.destroy(postDoc.cloudinary_id)
+        }
+
         await postDoc.updateOne({
             title,
             summary,
             content,
-            cover: newPath ? newPath : postDoc.cover,
+            cover: newCover ? newCover.secure_url : postDoc.cover,
+            cloudinary_id: newCover ? newCover.public_id : postDoc.cloudinary_id,
         });
 
         res.json(postDoc);
@@ -218,6 +210,8 @@ app.delete('/delete/:id', async (req, res) => {
     const { id } = req.params;
 
     const postInfo = await Post.findByIdAndDelete(id)
+
+    await cloudinary.uploader.destroy(postInfo.cloudinary_id)
 
     res.json(postInfo);
 })
