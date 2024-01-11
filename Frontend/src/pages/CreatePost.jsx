@@ -17,11 +17,14 @@ const CreatePost = () => {
 
   const createNewPost = async (e) => {
 
+    // console.log(localStorage.getItem('trendingblog-token'))
+
     const data = new FormData()
     data.set('title', title)
     data.set('summary', summary)
     data.set('content', content)
     data.set('file', files[0])
+    data.set('token', localStorage.getItem('trendingblog-token'))
 
     e.preventDefault()
 

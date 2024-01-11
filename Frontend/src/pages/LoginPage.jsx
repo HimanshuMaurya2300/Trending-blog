@@ -8,7 +8,7 @@ export default function LoginPage() {
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const { setUserInfo } = useContext(UserContext)
+    const { setUserInfo, storeToken } = useContext(UserContext)
 
     const login = async (e) => {
         e.preventDefault()
@@ -21,7 +21,10 @@ export default function LoginPage() {
         })
 
         if (response.ok) {
+
             response.json().then(userInfo => {
+                console.log(userInfo)
+                storeToken(userInfo.token)
                 setUserInfo(userInfo)
                 navigate('/')
             })

@@ -39,6 +39,8 @@ const EditPost = () => {
         data.set('summary', summary)
         data.set('content', content)
         data.set('id', id)
+        data.set('token', localStorage.getItem('trendingblog-token'))
+
 
         if (files?.[0]) {
             data.set('file', files?.[0])

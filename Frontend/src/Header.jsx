@@ -6,7 +6,7 @@ const Header = () => {
 
     const navigate = useNavigate()
 
-    const { userInfo, setUserInfo } = useContext(UserContext)
+    const { userInfo, setUserInfo, storeToken } = useContext(UserContext)
 
     useEffect(() => {
 
@@ -28,6 +28,7 @@ const Header = () => {
             method: 'POST',
         })
 
+        storeToken('')
         setUserInfo(null)
         navigate('/')
     }

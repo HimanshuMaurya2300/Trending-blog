@@ -70,16 +70,13 @@ app.post('/login', async (req, res) => {
                 throw err;
             }
 
-            res.cookie('token', token, {
-                domain: process.env.DOMAIN | '',
-                maxAge: 360000
-            })
-
-            res.json({
+            res.cookie('token', token).json({
                 id: userDoc._id,
                 username,
-            });
+                token: token
+            })
         });
+
     }
     else {
         res.status(400).json('wrong credentials');
@@ -119,7 +116,9 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
     const newPath = path + '.' + ext;
     fs.renameSync(path, newPath);
 
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.body;
+    console.log(token)
 
     jwt.verify(token, secret, {}, async (err, info) => {
 
@@ -156,7 +155,10 @@ app.put('/post', uploadMiddleware.single('file'), async (req, res) => {
         fs.renameSync(path, newPath);
     }
 
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+
+    const { token } = req.body;
+    console.log(token);
 
     jwt.verify(token, secret, {}, async (err, info) => {
 
