@@ -10,11 +10,14 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
 const cloudinary = require('./utils/cloudinary');
-const upload = require('./utils/multer')
+const upload = require('./utils/multer');
+const { job } = require('./cron/cron');
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
+// cron job
+job.start();
 
 app.use(cors({
     // origin: '*',
